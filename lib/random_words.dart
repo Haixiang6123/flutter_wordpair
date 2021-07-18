@@ -8,12 +8,13 @@ class RandomWords extends StatefulWidget {
 
 class RandomWordsState extends State<RandomWords> {
   final _randomWordPairs = <WordPair>[];
+  final _saveWordPairs = Set<WordPair>();
 
   Widget _buildList() {
     return ListView.builder(
         padding: const EdgeInsets.all(16),
         itemBuilder: (context, item) {
-          if(item.isOdd) return Divider();
+          if (item.isOdd) return Divider();
 
           final index = item ~/ 2;
 
@@ -24,12 +25,25 @@ class RandomWordsState extends State<RandomWords> {
 
           // 生成本 row
           return _buildRow(_randomWordPairs[index]);
-        }
-    );
+        });
   }
 
   Widget _buildRow(WordPair pair) {
-    return ListTile(title: Text(pair.asPascalCase, style: TextStyle(fontSize: 18)));
+    final alreadySaved = _saveWordPairs.contains(pair);
+    return ListTile(
+      title: Text(pair.asPascalCase, style: TextStyle(fontSize: 18)),
+      trailing: Icon(alreadySaved ? Icons.favorite : Icons.favorite_border,
+          color: alreadySaved ? Colors.red : null),
+      onTap: () {
+        setState(() {
+          if (alreadySaved) {
+            _saveWordPairs.remove(pair);
+          } else {
+            _saveWordPairs.add(pair);
+          }
+        });
+      },
+    );
   }
 
   Widget build(BuildContext context) {
@@ -37,7 +51,6 @@ class RandomWordsState extends State<RandomWords> {
         appBar: AppBar(
           title: Text('WordPair Generator'),
         ),
-        body: _buildList()
-    );
+        body: _buildList());
   }
 }
